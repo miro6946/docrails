@@ -1,30 +1,47 @@
-h2. Action Controller Overview
+h2. 액션 컨트롤러 둘러보기
 
 In this guide you will learn how controllers work and how they fit into the request cycle in your application. After reading this guide, you will be able to:
+이 가이드에서는 컨트롤러의 수행 방법 및 요청 주기 처리 방법을 배우게 될 것입니다. 
+가이드를 읽고 난 후, 다음과 같은 사항을 습득할 수 있을 것입니다.
 
 * Follow the flow of a request through a controller
+* 컨트롤러를 통하는 요청의 흐름을 따라가기
 * Understand why and how to store data in the session or cookies
+* 왜 그리고 어떻게 세션 또는 쿠키에 데이터를 저장하는지 이해하기
 * Work with filters to execute code during request processing
+* 요청을 처리하는 동안 실행되는 코드 필터 사용하기
 * Use Action Controller's built-in HTTP authentication
+* 액션 컨트롤러의 내장 HTTP 인증 사용하기
 * Stream data directly to the user's browser
+* 사용자 브라우져에 직접 데이터 스트리밍 하기
 * Filter sensitive parameters so they do not appear in the application's log
+* 어플리케이션 로그에 민감한 파라메터가 보이지 않도록 걸러내기
 * Deal with exceptions that may be raised during request processing
+* 요청 처리 중에 발생하는 예외 처리하기
 
 endprologue.
 
 h3. What Does a Controller Do?
+h3. 컨트롤러는 무슨 역할을 하는가?
 
 Action Controller is the C in MVC. After routing has determined which controller to use for a request, your controller is responsible for making sense of the request and producing the appropriate output. Luckily, Action Controller does most of the groundwork for you and uses smart conventions to make this as straightforward as possible.
+액션 컨트롤러는 MVC 중 C에 해당하는 부분입니다. 라우팅을 통해 해당 요청을 처리할 컨트롤러가 정해지면 그 컨트롤러는 요청을 이해하고 적절한 출력을 생산하는 임무를 담당합니다. 다행히도 액션 컨트롤러는 대부분의 기초 작업이 되어 있으며 깔금한 규약을 통해 최대한 쉽게 사용할 수 있습니다.
 
 For most conventional RESTful applications, the controller will receive the request (this is invisible to you as the developer), fetch or save data from a model and use a view to create HTML output. If your controller needs to do things a little differently, that's not a problem, this is just the most common way for a controller to work.
+대부분의 규약에 의거한 레스트풀(RESTful) 어플리케이션에서 컨트롤러는 요청을 받아서(이 과정은 개발자에게 보이지 않음), 모델을 통해 데이터를 인출 하거나 저장을 하고 HTML 출력을 생성하여 뷰로 사용합니다. 앞서 설명한 부분은 단지 대부분의 컨트롤러의 경우를 말할 뿐, 만약 만들려는 컨트롤러가 약간 다른 무언가를 하길 바란다면 별로 문제될 것이 없습니다.
 
 A controller can thus be thought of as a middle man between models and views. It makes the model data available to the view so it can display that data to the user, and it saves or updates data from the user to the model.
+컨트롤러는 마치 모델과 뷰의 중개인과 같은 역할을 합니다. 모델의 데이터를 뷰단에서 이용가능하도록 처리하여 사용자게에 데이터를 보여주고, 사용자로 하여금 데이터를 저장 및 수정하여 모델에 반영할 수 있도록 해줍니다.
 
 NOTE: For more details on the routing process, see "Rails Routing from the Outside In":routing.html.
+NOTE: 라우팅 처리과정의 상세한 설명이 필요하시면 "외부 요청에 대한 레일즈 라우팅":routing.html 을 참고하세요. 
+
 
 h3. Methods and Actions
+h3. 메소드와 액션
 
 A controller is a Ruby class which inherits from +ApplicationController+ and has methods just like any other class. When your application receives a request, the routing will determine which controller and action to run, then Rails creates an instance of that controller and runs the method with the same name as the action.
+컨트롤러는 +ApplicationController+를 상속받는 루비 클래스이며 여타 다른 클래스와 같이 여러 메소드를 갖습니다. 어플리케이션이 요청을 받았을 때, 라우팅은 어떤 컨트롤러의 어떤 액션이 실행될지 결정한 다음, 레일즈는 컨트롤러의 인스턴스를 생성, 요청된 액션과 동일하게 명명된 메소드를 실행합니다.
 
 <ruby>
 class ClientsController < ApplicationController
@@ -34,6 +51,7 @@ end
 </ruby>
 
 As an example, if a user goes to +/clients/new+ in your application to add a new client, Rails will create an instance of +ClientsController+ and run the +new+ method. Note that the empty method from the example above could work just fine because Rails will by default render the +new.html.erb+ view unless the action says otherwise. The +new+ method could make available to the view a +@client+ instance variable by creating a new +Client+:
+예를 들어, 사용자가 어플리케이션에 새로운 클라이언트를 추가하기 위해 +/clients/new+ 호출한다면, 레일즈는 +ClientsController+의 인스턴스를 생성하고 +new+ 메소드를 실행시킵니다. 짚고 넘어갈 것은 내용이 없는 빈 메소드라 할지라도 레일즈는 액션에 기타 다른 언급이 없다면 기본적으로 +new.html.erb+ 뷰로서 렌더링 하므로 잘 작동된다는 것입니다. +new+ 메소드는 뷰에서 +@client+ 인스턴스 변수를 사용할 수 있도록 새로운 +Client+ 만들어낼 수 있습니다.
 
 <ruby>
 def new
